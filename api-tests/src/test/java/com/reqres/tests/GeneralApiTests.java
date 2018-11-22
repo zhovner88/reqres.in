@@ -54,7 +54,8 @@ public class GeneralApiTests {
                 .setJob("Plumber")
                 .setName("John");
 
-        userApiService.createUser(testUser);
+        userApiService.createUser(testUser)
+                .assertThat().statusCode(201);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class GeneralApiTests {
     }
 
     @Test
-    void verifyThatItsPossibleToRemoveUser() {
+    void verifyThatItsPossibleToDeleteUser() {
         given()
                 .contentType("application/json")
                 .log().all()
@@ -96,7 +97,10 @@ public class GeneralApiTests {
                 .setEmail("test@mail.com")
                 .setPassword("testPassword");
 
-        userApiService.registerUser(testUser);
+        userApiService.registerUser(testUser)
+                .assertThat()
+                .statusCode(201)
+                .body("id", not(isEmptyString()));
     }
 
     @Test
@@ -104,6 +108,9 @@ public class GeneralApiTests {
         User testUser = new User()
                 .setEmail("testemail@mail.com");
 
-        userApiService.createUserWithError(testUser);
+        userApiService.registerUser(testUser)
+                .assertThat()
+                .statusCode(400)
+                .body("error", equalTo("Missing password"));
     }
 }

@@ -1,6 +1,7 @@
 package com.reqres.tests;
 
 import com.reqres.api.User;
+import com.reqres.api.UserApiService;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ public class GeneralApiTests {
     static void setUp() {
         RestAssured.baseURI = "https://reqres.in/api/";
     }
+
+    UserApiService userApiService = new UserApiService();
 
     @Test
     void pageCanReturnListOfUsers() {
@@ -51,17 +54,7 @@ public class GeneralApiTests {
                 .setJob("Plumber")
                 .setName("John");
 
-        given()
-                .contentType("application/json")
-                .body(testUser)
-                .log().all()
-        .when()
-                .post("users")
-        .then()
-                .log().all()
-                .assertThat()
-                .statusCode(201)
-                .body("id", not(isEmptyString()));
+        userApiService.createUser(testUser);
     }
 
     @Test
@@ -103,17 +96,7 @@ public class GeneralApiTests {
                 .setEmail("test@mail.com")
                 .setPassword("testPassword");
 
-        given()
-                .contentType("application/json")
-                .body(testUser)
-                .log().all()
-        .when()
-                .post("register")
-        .then()
-                .log().all()
-                .assertThat()
-                .statusCode(201)
-                .body("token", not(isEmptyString()));
+        userApiService.registerUser(testUser);
     }
 
     @Test
@@ -121,15 +104,6 @@ public class GeneralApiTests {
         User testUser = new User()
                 .setEmail("testemail@mail.com");
 
-        given()
-                .contentType("application/json")
-                .body(testUser)
-        .when()
-                .post("register")
-        .then()
-                .log().all()
-                .assertThat()
-                .statusCode(400)
-                .body("error", equalTo("Missing password"));
+        userApiService.createUserWithError(testUser);
     }
 }

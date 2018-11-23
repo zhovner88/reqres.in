@@ -1,6 +1,7 @@
 package com.reqres.tests;
 
 import com.reqres.api.model.User;
+import com.reqres.api.services.TestData;
 import com.reqres.api.services.UserApiService;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,6 +20,7 @@ public class GeneralApiTests {
     }
 
     private UserApiService userApiService = new UserApiService();
+    private TestData testData = new TestData();
 
     @Test
     void pageCanReturnListOfUsers() {
@@ -49,10 +51,22 @@ public class GeneralApiTests {
     }
 
     @Test
+    void verifyThatItsPossibleToDeleteUser() {
+        given()
+                .contentType("application/json")
+                .log().all()
+                .when()
+                .delete("users/2")
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(204);
+    }
+
+    @Test
     void verifyThatTestCanCreateNewUser() {
-        User testUser = new User()
-                .setJob("Plumber")
-                .setName("John");
+
+        User testUser = testData.SetUserForTests();
 
         userApiService.createUser(testUser)
                 .assertThat().statusCode(201);
@@ -60,9 +74,8 @@ public class GeneralApiTests {
 
     @Test
     void verifyThatItsPossibleToUpdateUser() {
-        User testUser = new User()
-                .setName("John")
-                .setJob("Plumber manager");
+
+        User testUser = testData.SetUserForTests();
 
         userApiService.updateUser(testUser)
                 .assertThat()
@@ -72,25 +85,9 @@ public class GeneralApiTests {
     }
 
     @Test
-    void verifyThatItsPossibleToDeleteUser() {
-        given()
-                .contentType("application/json")
-                .log().all()
-        .when()
-                .delete("users/2")
-        .then()
-                .log().all()
-                .assertThat()
-                .statusCode(204);
-    }
-
-    // to-do: randomize username and email fields for each run
-    @Test
     void testCanRegisterNewUser() {
 
-        User testUser = new User()
-                .setEmail("test@mail.com")
-                .setPassword("testPassword");
+        User testUser = testData.SetUserForTests();
 
         userApiService.registerUser(testUser)
                 .assertThat()
@@ -100,12 +97,22 @@ public class GeneralApiTests {
 
     @Test
     void TestCanNotifyAboutMissingPassword() {
-        User testUser = new User()
-                .setEmail("testemail@mail.com");
+
+        User testUser = testData.SetUserWithMissedPassword();
 
         userApiService.registerUser(testUser)
                 .assertThat()
                 .statusCode(400)
                 .body("error", equalTo("Missing password"));
+    }
+
+    @Test
+    void TestCanNotifyAboutMissingEmail() {
+        User testUser = testData.SetUserWithMissingEmail();
+
+        userApiService.registerUser(testUser)
+                .assertThat()
+                .statusCode(400)
+                .body("error", equalTo("Missing email or username"));
     }
 }

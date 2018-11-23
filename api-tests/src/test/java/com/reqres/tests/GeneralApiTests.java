@@ -18,7 +18,7 @@ public class GeneralApiTests {
         RestAssured.baseURI = "https://reqres.in/api/";
     }
 
-    private UserApiService userApiService = new UserApiService();
+    UserApiService userApiService = new UserApiService();
 
     @Test
     void pageCanReturnListOfUsers() {

@@ -1,6 +1,9 @@
-package com.reqres.api;
+package com.reqres.api.services;
 
+import com.reqres.api.model.User;
 import io.restassured.RestAssured;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -10,21 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 public class UserApiService {
 
     public RequestSpecification setup() {
-        return RestAssured
-                .given()
-                .contentType(ContentType.JSON);
+        return RestAssured.given()
+                .contentType(ContentType.JSON)
+                .filters(new RequestLoggingFilter(),
+                new ResponseLoggingFilter()); // filters for logging, could be added or removed
     }
 
     public ValidatableResponse registerUser(User user) {
         log.info("Registering a new {}", user);
-        
+
         return setup()
-                    .log().all()
                     .body(user)
             .when()
                     .post("register")
-            .then()
-                    .log().all();
+            .then();
     }
 
     public ValidatableResponse createUser(User user) {
@@ -35,6 +37,18 @@ public class UserApiService {
                 .log().all()
         .when()
                 .post("users")
+        .then()
+                .log().all();
+    }
+
+    public ValidatableResponse updateUser(User user) {
+        log.info("Updating an existing user {}", user);
+
+        return setup()
+                .body(user)
+                .log().all()
+        .when()
+                .patch("users/2")
         .then()
                 .log().all();
     }

@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.socks.api.services" level="INFO" additivity="false">
+    <logger name="com.reqres.api.services" level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

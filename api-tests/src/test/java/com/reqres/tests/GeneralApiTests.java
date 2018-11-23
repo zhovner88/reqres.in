@@ -1,7 +1,7 @@
 package com.reqres.tests;
 
-import com.reqres.api.User;
-import com.reqres.api.UserApiService;
+import com.reqres.api.model.User;
+import com.reqres.api.services.UserApiService;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,13 +64,7 @@ public class GeneralApiTests {
                 .setName("John")
                 .setJob("Plumber manager");
 
-        given()
-                .contentType("application/json")
-                .body(testUser)
-                .log().all()
-        .when()
-                .patch("users/2")
-        .then()
+        userApiService.updateUser(testUser)
                 .assertThat()
                 .statusCode(200)
                 .body("name", equalTo(testUser.getName()))
@@ -93,6 +87,7 @@ public class GeneralApiTests {
     // to-do: randomize username and email fields for each run
     @Test
     void testCanRegisterNewUser() {
+
         User testUser = new User()
                 .setEmail("test@mail.com")
                 .setPassword("testPassword");
